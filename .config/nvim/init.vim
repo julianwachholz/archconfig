@@ -253,6 +253,58 @@ endfunction
 let g:SimpylFold_docstring_preview = 1
 let g:SimpylFold_fold_import = 1
 
+" Netrw
+set wildignore=*.pyc,__pycache__,.DS_Store,*.exe,*.sw[po],.git/,node_modules,.idea/,.cache/,.venv/
+nnoremap <C-n> :call VexToggle(getcwd())<CR>
+nnoremap <C-m> :call VexToggle("")<CR>
+
+fun! VexToggle(dir)
+  if exists("t:vex_buf_nr")
+    call VexClose()
+  else
+    call VexOpen(a:dir)
+  endif
+endf
+
+fun! VexOpen(dir)
+  let g:netrw_browse_split=4    " open files in previous window
+  let vex_width = 25
+
+  execute "Vexplore " . a:dir
+  let t:vex_buf_nr = bufnr("%")
+  wincmd H
+
+  call VexSize(vex_width)
+endf
+
+fun! VexClose()
+  let cur_win_nr = winnr()
+  let target_nr = ( cur_win_nr == 1 ? winnr("#") : cur_win_nr )
+
+  1wincmd w
+  close
+  unlet t:vex_buf_nr
+
+  execute (target_nr - 1) . "wincmd w"
+  call NormalizeWidths()
+endf
+
+fun! VexSize(vex_width)
+  execute "vertical resize" . a:vex_width
+  set winfixwidth
+  call NormalizeWidths()
+endf
+
+fun! NormalizeWidths()
+  let eadir_pref = &eadirection
+  set eadirection=hor
+  set equalalways! equalalways!
+  let &eadirection = eadir_pref
+endf
+
+augroup NetrwGroup
+  autocmd! BufEnter * call NormalizeWidths()
+augroup END
 
 " Deoplete {{{
 let g:deoplete#enable_at_startup = 1

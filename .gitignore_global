@@ -1,0 +1,7 @@
+# Global gitignores
+
+.idea
+.venv
+.envrc
+*.sublime-project
+*.sublime-workspace
